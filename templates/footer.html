@@ -1,0 +1,11 @@
+</main>
+
+{% if !args.hide_footer && args.footer_text.as_ref().is_some() %}
+<footer class="site-footer">
+    <p>{{ args.footer_text.as_ref().unwrap() }}</p>
+</footer>
+{%- endif %}
+
+</body>
+
+</html>

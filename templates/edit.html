@@ -1,0 +1,24 @@
+{% include "header.html" %}
+
+<section class="page-card edit-card">
+  <form class="submit-form creator-form" method="POST" enctype="multipart/form-data">
+    <h2 class="page-title">{{ i18n.text("edit") }} Pasta</h2>
+    <p class="page-subtitle"><span class="key-badge">{{ pasta.public_key() }}</span></p>
+    <div class="form-field content-field">
+      <div class="content-field__meta">
+        <label for="content">{{ i18n.text("content") }}</label>
+        <span id="content-counter" class="content-counter" data-suffix="{{ i18n.text("characters") }}">0 {{ i18n.text("characters") }}</span>
+      </div>
+      <textarea name="content" id="content" autofocus>{{ pasta.content }}</textarea>
+    </div>
+    <div class="form-actions">
+      {% if args.readonly %}
+      <button type="submit" disabled data-saving-label="{{ i18n.text("saving") }}">{{ i18n.text("read_only") }}</button>
+      {%- else %}
+      <button type="submit" data-saving-label="{{ i18n.text("saving") }}">{{ i18n.text("save") }}</button>
+      {%- endif %}
+    </div>
+  </form>
+</section>
+
+{% include "footer.html" %}

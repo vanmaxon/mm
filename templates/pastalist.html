@@ -1,0 +1,96 @@
+{% include "header.html" %}
+
+<section class="page-card listing-card">
+{% if pastas.is_empty() %}
+  <div class="empty-state">
+    <h2 class="page-title">{{ i18n.text("no_pastas") }}</h2>
+    <p>{{ i18n.text("create_one") }} <a href="{{ args.public_path }}/">{{ i18n.text("here") }}</a>.</p>
+  </div>
+{%- else %}
+  <h2 class="page-title">{{ i18n.text("pastas") }}</h2>
+  <div class="table-card">
+  {% if args.pure_html %}
+  <table border="1" style="width: 100%; white-space: nowrap;">
+  {% else %}
+  <table>
+  {%- endif %}
+    <thead>
+      <tr>
+        <th>{{ i18n.text("key") }}</th>
+        <th>{{ i18n.text("created") }}</th>
+        <th>{{ i18n.text("expiration") }}</th>
+        <th>{{ i18n.text("actions") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pasta in pastas %}
+      {% if pasta.pasta_type == "text" && !pasta.private %}
+      <tr>
+        <td data-label="{{ i18n.text("key") }}"><a href="{{ args.public_path }}/pasta/{{pasta.public_key()}}">{{pasta.public_key()}}</a></td>
+        <td data-label="{{ i18n.text("created") }}">{{pasta.created_as_string()}}</td>
+        <td data-label="{{ i18n.text("expiration") }}">{% if pasta.expiration == 0 %}{{ i18n.text("never") }}{% else %}{{pasta.expiration_as_string()}}{% endif %}</td>
+        <td class="table-actions-cell" data-label="{{ i18n.text("actions") }}">
+          <div class="table-actions">
+            <a href="{{ args.public_path }}/raw/{{pasta.public_key()}}">{{ i18n.text("raw") }}</a>
+            {% if pasta.file.is_some() %}<a href="{{ args.public_path }}/file/{{pasta.public_key()}}/{{pasta.file.as_ref().unwrap().name()}}">{{ i18n.text("file") }}</a>{%- endif %}
+            {% if pasta.editable %}<a href="{{ args.public_path }}/edit/{{pasta.public_key()}}">{{ i18n.text("edit") }}</a>{%- endif %}
+            <a data-confirm-remove="{{ i18n.text("confirm_remove") }}" href="{{ args.public_path }}/remove/{{pasta.public_key()}}">{{ i18n.text("remove") }}</a>
+          </div>
+        </td>
+      </tr>
+      {%- endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+
+  <h2 class="page-title section-title">{{ i18n.text("url_redirects") }}</h2>
+  <div class="table-card">
+  {% if args.pure_html %}
+  <table border="1" style="width: 100%;">
+  {% else %}
+  <table>
+  {%- endif %}
+    <thead>
+      <tr>
+        <th>{{ i18n.text("key") }}</th>
+        <th>{{ i18n.text("created") }}</th>
+        <th>{{ i18n.text("expiration") }}</th>
+        <th>{{ i18n.text("actions") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pasta in pastas %}
+      {% if pasta.pasta_type == "url" && !pasta.private %}
+      <tr>
+        <td data-label="{{ i18n.text("key") }}"><a href="{{ args.public_path }}/pasta/{{pasta.public_key()}}">{{pasta.public_key()}}</a></td>
+        <td data-label="{{ i18n.text("created") }}">{{pasta.created_as_string()}}</td>
+        <td data-label="{{ i18n.text("expiration") }}">{% if pasta.expiration == 0 %}{{ i18n.text("never") }}{% else %}{{pasta.expiration_as_string()}}{% endif %}</td>
+        <td class="table-actions-cell" data-label="{{ i18n.text("actions") }}">
+          <div class="table-actions">
+            <a href="{{ args.public_path }}/url/{{pasta.public_key()}}">{{ i18n.text("open") }}</a>
+            <button type="button" class="link-button" data-copy-url="{{ args.public_path }}/url/{{pasta.public_key() }}">{{ i18n.text("copy") }}</button>
+            {% if pasta.editable %}<a href="{{ args.public_path }}/edit/{{pasta.public_key()}}">{{ i18n.text("edit") }}</a>{%- endif %}
+            <a data-confirm-remove="{{ i18n.text("confirm_remove") }}" href="{{ args.public_path }}/remove/{{pasta.public_key()}}">{{ i18n.text("remove") }}</a>
+          </div>
+        </td>
+      </tr>
+      {%- endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+{%- endif %}
+</section>
+
+<script>
+  document.querySelectorAll("[data-copy-url]").forEach((button) => {
+    button.addEventListener("click", () => {
+      navigator.clipboard.writeText(button.dataset.copyUrl)
+      button.textContent = "{{ i18n.text("copied") }}"
+      setTimeout(() => { button.textContent = "{{ i18n.text("copy") }}" }, 1000)
+    })
+  })
+</script>
+
+{% include "footer.html" %}

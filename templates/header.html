@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="{{ i18n.html_lang() }}">
+
+<head>
+    {% if args.title.as_ref().is_none() %}
+    <title>MicroBin</title>
+    {%- else %}
+    <title>{{ args.title.as_ref().unwrap() }}</title>
+    {%- endif %}
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="{{ args.public_path }}/static/favicon.svg">
+    {% if !args.pure_html %}
+    {% if args.custom_css.as_ref().is_none() %}
+    <script>
+        (function () {
+            try {
+                var theme = localStorage.getItem("microbin_theme");
+                document.documentElement.dataset.theme = theme ||
+                    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+            } catch (_) { }
+        })();
+    </script>
+    <link rel="stylesheet" href="{{ args.public_path }}/static/water.css">
+    <link rel="stylesheet" href="{{ args.public_path }}/static/app.css">
+    {%- else %}
+    <link rel="stylesheet" href="{{ args.custom_css.as_ref().unwrap() }}">
+    {%- endif %}
+    {%- endif %}
+    <script defer src="{{ args.public_path }}/static/app.js"></script>
+
+</head>
+{% if args.wide %}
+<body class="layout-wide">
+    {%- else %}
+<body class="layout-standard">
+        {%- endif %}
+
+        {% if !args.hide_header %}
+        <header class="site-header">
+            <a class="site-header__brand" href="{{ args.public_path }}/">
+                {% if !args.hide_logo %}
+                <img src="{{ args.public_path }}/static/logo.png" alt="MicroBin">
+                {%- endif %}
+                <span>{% if args.title.as_ref().is_none() %}MicroBin{%- else %}{{ args.title.as_ref().unwrap() }}{%- endif %}</span>
+            </a>
+
+            <nav class="site-nav" aria-label="{{ i18n.text("navigation") }}">
+                <a href="{{ args.public_path }}/">{{ i18n.text("new") }}</a>
+                <a href="{{ args.public_path }}/pastalist">{{ i18n.text("list") }}</a>
+                <a href="{{ args.public_path }}/info">{{ i18n.text("info") }}</a>
+            </nav>
+
+            <div class="site-header__controls">
+                {% if !args.pure_html && args.custom_css.as_ref().is_none() %}
+                <button id="theme-toggle" class="theme-toggle" type="button" data-light-label="{{ i18n.text("theme_light") }}" data-dark-label="{{ i18n.text("theme_dark") }}" aria-label="{{ i18n.text("theme_dark") }}" title="{{ i18n.text("theme_dark") }}">☾</button>
+                {%- endif %}
+                <select class="language-select" aria-label="{{ i18n.text("language") }}" onchange="window.location.href=this.value">
+                {% if i18n.is_english() %}
+                <option selected value="{{ args.public_path }}{{ i18n.switch_url("en", current_path) }}">{{ i18n.text("english") }}</option>
+                {%- else %}
+                <option value="{{ args.public_path }}{{ i18n.switch_url("en", current_path) }}">{{ i18n.text("english") }}</option>
+                {%- endif %}
+                {% if i18n.is_simplified_chinese() %}
+                <option selected value="{{ args.public_path }}{{ i18n.switch_url("zh-CN", current_path) }}">{{ i18n.text("simplified_chinese") }}</option>
+                {%- else %}
+                <option value="{{ args.public_path }}{{ i18n.switch_url("zh-CN", current_path) }}">{{ i18n.text("simplified_chinese") }}</option>
+                {%- endif %}
+                </select>
+            </div>
+        </header>
+
+        {%- endif %}
+
+        <main class="page-main">

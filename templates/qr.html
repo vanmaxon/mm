@@ -1,0 +1,10 @@
+{% include "header.html" %}
+
+<section class="page-card qr-card">
+  <div class="page-toolbar">
+    <a class="button" href="{{ args.public_path }}/pasta/{{pasta.public_key()}}">{{ i18n.text("back_to_pasta") }}</a>
+  </div>
+  <div class="qr-card__image">{{qr}}</div>
+</section>
+
+{% include "footer.html" %}

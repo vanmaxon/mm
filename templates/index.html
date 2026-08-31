@@ -1,0 +1,243 @@
+{% include "header.html" %}
+
+<section class="page-card creator-card">
+<form id="pasta-form" class="creator-form" action="upload" method="POST" enctype="multipart/form-data">
+    {% if error_message.is_some() %}
+    <p class="form-error">{{ i18n.text(error_message.as_ref().unwrap()) }}</p>
+    {%- endif %}
+    <div class="form-field">
+    <label for="custom-key">{{ i18n.text("custom_key") }}</label>
+    <input id="custom-key" name="custom_key" value="{{ custom_key }}" minlength="3" maxlength="64"
+        pattern="[a-z0-9_-]{3,64}" autocomplete="off">
+    <small>{{ i18n.text("custom_key_hint") }}</small>
+    <span id="custom-key-status" class="field-status" aria-live="polite"
+        data-empty-label="{{ i18n.text("custom_key_empty") }}"
+        data-valid-label="{{ i18n.text("custom_key_valid") }}"
+        data-invalid-label="{{ i18n.text("custom_key_invalid") }}"></span>
+    </div>
+    <br>
+    <div id="settings">
+        <div>
+            <label for="expiration">{{ i18n.text("expiration") }}</label><br>
+            <select style="width: 100%;" name="expiration" id="expiration">
+                <optgroup label="{{ i18n.text("expire_after") }}">
+                    {% if args.default_expiry == "1min" %}
+                    <option selected value="1min">
+                        {%- else %}
+                    <option value="1min">
+                        {%- endif %}
+                        {{ i18n.text("one_minute") }}
+                    </option>
+                    {% if args.default_expiry == "10min" %}
+                    <option selected value="10min">
+                        {%- else %}
+                    <option value="10min">
+                        {%- endif %}
+                        {{ i18n.text("ten_minutes") }}
+                    </option>
+                    {% if args.default_expiry == "1hour" %}
+                    <option selected value="1hour">
+                        {%- else %}
+                    <option value="1hour">
+                        {%- endif %}
+                        {{ i18n.text("one_hour") }}
+                    </option>
+                    {% if args.default_expiry == "24hour" %}
+                    <option selected value="24hour">
+                        {%- else %}
+                    <option value="24hour">
+                        {%- endif %}
+                        {{ i18n.text("twenty_four_hours") }}
+                    </option>
+                    {% if args.default_expiry == "3days" %}
+                    <option selected value="3days">
+                        {%- else %}
+                    <option value="3days">
+                        {%- endif %}
+                        {{ i18n.text("three_days") }}
+                    </option>
+                    {% if args.default_expiry == "1week" %}
+                    <option selected value="1week">
+                        {%- else %}
+                    <option value="1week">
+                        {%- endif %}
+                        {{ i18n.text("one_week") }}
+                    </option>
+                </optgroup>
+                {% if !args.no_eternal_pasta %}
+                {% if args.default_expiry == "never" %}
+                <option selected value="never">{{ i18n.text("never_expire") }}</option>
+                {%- else %}
+                <option value="never">{{ i18n.text("never_expire") }}</option>
+                {%- endif %}
+                {%- endif %}
+            </select>
+        </div>
+        {% if args.enable_burn_after %}
+        <div>
+            <label for="burn_after">{{ i18n.text("burn_after") }}</label><br>
+            <select style="width: 100%;" name="burn_after" id="burn_after">
+                <optgroup label="{{ i18n.text("burn_after_group") }}">
+                    {% if args.default_burn_after == 1 %}
+                    <option selected value="1">
+                        {%- else %}
+                    <option value="1">
+                        {%- endif %}
+                        {{ i18n.text("first_read") }}
+                    </option>
+                    {% if args.default_burn_after == 10 %}
+                    <option selected value="10">
+                        {%- else %}
+                    <option value="10">
+                        {%- endif %}
+                        {{ i18n.text("tenth_read") }}
+                    </option>
+                    {% if args.default_burn_after == 100 %}
+                    <option selected value="100">
+                        {%- else %}
+                    <option value="100">
+                        {%- endif %}
+                        {{ i18n.text("hundredth_read") }}
+                    </option>
+                    {% if args.default_burn_after == 1000 %}
+                    <option selected value="1000">
+                        {%- else %}
+                    <option value="1000">
+                        {%- endif %}
+                        {{ i18n.text("thousandth_read") }}
+                    </option>
+                    {% if args.default_burn_after == 10000 %}
+                    <option selected value="10000">
+                        {%- else %}
+                    <option value="10000">
+                        {%- endif %}
+                        {{ i18n.text("ten_thousandth_read") }}
+                    </option>
+                </optgroup>
+                {% if args.default_burn_after == 0 %}
+                <option selected value="0">
+                    {%- else %}
+                <option value="0">
+                    {%- endif %}
+                    {{ i18n.text("no_limit") }}
+                </option>
+            </select>
+        </div>
+        {%- endif %}
+
+        {% if args.highlightsyntax %}
+        <div>
+            <label for="syntax-highlight">{{ i18n.text("syntax") }}</label><br>
+            <select style="width: 100%;" name="syntax-highlight" id="syntax-highlight">
+                <option value="none">{{ i18n.text("none") }}</option>
+                <optgroup label="{{ i18n.text("source_code") }}">
+                    <option value="sh">{{ i18n.text("bash_shell") }}</option>
+                    <option value="c">C</option>
+                    <option value="cpp">C++</option>
+                    <option value="cs">C#</option>
+                    <option value="pas">{{ i18n.text("delphi") }}</option>
+                    <option value="erl">Erlang</option>
+                    <option value="go">Go</option>
+                    <option value="hs">Haskell</option>
+                    <option value="html">HTML</option>
+                    <option value="lua">Lua</option>
+                    <option value="lisp">Lisp</option>
+                    <option value="java">Java</option>
+                    <option value="js">{{ i18n.text("javascript") }}</option>
+                    <option value="kt">Kotlin</option>
+                    <option value="py">Python</option>
+                    <option value="php">PHP</option>
+                    <option value="r">R</option>
+                    <option value="rs">Rust</option>
+                    <option value="rb">Ruby</option>
+                    <option value="sc">Scala</option>
+                    <option value="swift">Swift</option>
+                </optgroup>
+                <optgroup label="{{ i18n.text("descriptors") }}">
+                    <!-- no toml support ;-( -->
+                <option value="json">TOML</option>
+                    <option value="yaml">YAML</option>
+                    <option value="json">JSON</option>
+                    <option value="xml">XML</option>
+                </optgroup>
+            </select>
+        </div>
+        {%- else %}
+        <input type="hidden" name="syntax-highlight" value="none">
+        {%- endif %}
+
+        <div>
+            {% if args.editable || args.private %}
+                <label>{{ i18n.text("other") }}</label>
+            {%- endif %}
+            {% if args.editable %}
+            <div>
+                <input type="checkbox" id="editable" name="editable" value="editable" checked>
+                <label for="editable">{{ i18n.text("editable") }}</label>
+            </div>
+            {%- endif %}
+            {% if args.private %}
+            <div>
+                <input type="checkbox" id="private" name="private" value="private">
+                <label for="private">{{ i18n.text("private") }}</label>
+            </div>
+            {%- endif %}
+        </div>
+    </div>
+    <div class="form-field content-field">
+        <div class="content-field__meta">
+            <label for="content">{{ i18n.text("content") }}</label>
+            <span id="content-counter" class="content-counter" data-suffix="{{ i18n.text("characters") }}">0 {{ i18n.text("characters") }}</span>
+        </div>
+        <textarea name="content" id="content" autofocus>{{ content }}</textarea>
+    </div>
+    <div class="form-actions">
+        {% if !args.no_file_upload %}
+        <div id="drop-zone" class="drop-zone">
+            <label for="file" class="drop-zone__label">{{ i18n.text("select_or_drop_file") }}</label>
+            <span id="file-name" class="drop-zone__filename" data-empty-label="{{ i18n.text("no_file") }}">{{ i18n.text("no_file") }}</span>
+            <button id="clear-file" class="drop-zone__clear" type="button" hidden>{{ i18n.text("clear_file") }}</button>
+            <input type="file" id="file" name="file" />
+        </div>
+        {% endif %}
+        {% if args.readonly %}
+            <button type="submit" disabled data-saving-label="{{ i18n.text("saving") }}">{{ i18n.text("read_only") }}</button>
+        {%- else %}
+            <button type="submit" data-saving-label="{{ i18n.text("saving") }}">{{ i18n.text("save") }}</button>
+        {%- endif %}
+    </div>
+
+</form>
+</section>
+
+<script>
+    const hiddenFileButton = document.getElementById('file');
+    const attachFileButton = document.getElementById('attach-file-button');
+    const dropContainer = document.getElementById('pasta-form');
+
+    if (hiddenFileButton && attachFileButton && dropContainer) {
+        hiddenFileButton.addEventListener('change', function () {
+            attachFileButton.textContent = "{{ i18n.text("attached") }}" + this.files[0].name;
+        });
+
+        dropContainer.ondragover = dropContainer.ondragenter = function (evt) {
+            evt.preventDefault();
+            if (hiddenFileButton.files.length == 0) {
+                attachFileButton.textContent = "{{ i18n.text("drop_file") }}";
+            } else {
+                attachFileButton.textContent = "{{ i18n.text("drop_replace_file") }} " + hiddenFileButton.files[0].name;
+            }
+        };
+
+        dropContainer.ondrop = function (evt) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(evt.dataTransfer.files[0]);
+            hiddenFileButton.files = dataTransfer.files;
+            attachFileButton.textContent = "{{ i18n.text("attached") }}" + hiddenFileButton.files[0].name;
+            evt.preventDefault();
+        };
+    }
+
+</script>
+
+{% include "footer.html" %}

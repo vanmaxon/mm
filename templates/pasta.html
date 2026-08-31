@@ -1,0 +1,91 @@
+{% include "header.html" %}
+
+<section class="page-card pasta-card">
+  <div class="page-toolbar">
+    <div class="action-group">
+      {% if pasta.content != "No Text Content" %}
+      <button id="copy-text-button" class="copy-button" type="button">{{ i18n.text("copy_text") }}</button>
+      {% if args.public_path.to_string() != "" && pasta.pasta_type == "url" %}
+      <button id="copy-redirect-button" class="copy-button" type="button">{{ i18n.text("copy_redirect") }}</button>
+      {%- endif %}
+      <a class="button copy-button" href="{{ args.public_path }}/raw/{{pasta.public_key()}}">{{ i18n.text("raw_text_content") }}</a>
+      {%- endif %}
+      {% if args.qr && args.public_path.to_string() != "" %}
+      <a class="button copy-button" href="{{ args.public_path }}/qr/{{pasta.public_key()}}">{{ i18n.text("qr") }}</a>
+      {%- endif %}
+      {% if pasta.editable %}
+      <a class="button copy-button" href="{{ args.public_path }}/edit/{{pasta.public_key()}}">{{ i18n.text("edit") }}</a>
+      {%- endif %}
+      <a class="button copy-button" data-confirm-remove="{{ i18n.text("confirm_remove") }}" href="{{ args.public_path }}/remove/{{pasta.public_key()}}">{{ i18n.text("remove") }}</a>
+    </div>
+    <div class="action-group">
+      <a class="key-badge" href="{{ args.public_path }}/pasta/{{pasta.public_key()}}">{{pasta.public_key()}}</a>
+      {% if args.public_path.to_string() != "" %}
+      <button id="copy-url-button" class="copy-button" type="button">{{ i18n.text("copy_url") }}</button>
+      {%- endif %}
+    </div>
+  </div>
+
+  {% if pasta.file.is_some() %}
+  <div class="attachment-card">
+    <a href="{{ args.public_path }}/file/{{pasta.public_key()}}/{{pasta.file.as_ref().unwrap().name()}}" download>
+      {{ i18n.text("download_attached_file") }}'{{pasta.file.as_ref().unwrap().name()}}' [{{pasta.file.as_ref().unwrap().size}}]
+    </a>
+  </div>
+  {%- endif %}
+
+  {% if pasta.content != "No Text Content" %}
+  <div class="code-container">
+    {% if args.highlightsyntax %}
+    <pre><code id="code">{{pasta.content_syntax_highlighted()}}</code></pre>
+    {%- else %}
+    <pre><code id="code">{{pasta.content_not_highlighted()}}</code></pre>
+    {%- endif %}
+  </div>
+  {%- endif %}
+
+  <div class="meta-card pasta-meta">
+    {{ i18n.read_summary(pasta.read_count, pasta.last_read_elapsed_seconds()) }}
+  </div>
+</section>
+
+<script>
+  const copyURLBtn = document.getElementById("copy-url-button")
+  const copyTextBtn = document.getElementById("copy-text-button")
+  const copyRedirectBtn = document.getElementById("copy-redirect-button")
+  const content = `{{ pasta.content_escaped() }}`
+  const url = `{{ args.public_path }}/pasta/{{pasta.public_key()}}`
+  const redirect_url = `{{ args.public_path }}/url/{{pasta.public_key()}}`
+
+  const decodeEntity = (inputStr) => {
+    var textarea = document.createElement("textarea");
+    textarea.innerHTML = inputStr;
+    return textarea.value;
+  }
+
+  if (copyURLBtn) {
+    copyURLBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(url)
+      copyURLBtn.innerHTML = "{{ i18n.text("copied") }}"
+      setTimeout(() => { copyURLBtn.innerHTML = "{{ i18n.text("copy_url") }}" }, 1000)
+    })
+  }
+
+  if (copyRedirectBtn) {
+    copyRedirectBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(redirect_url)
+      copyRedirectBtn.innerHTML = "{{ i18n.text("copied") }}"
+      setTimeout(() => { copyRedirectBtn.innerHTML = "{{ i18n.text("copy_redirect") }}" }, 1000)
+    })
+  }
+
+  if (copyTextBtn) {
+    copyTextBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(decodeEntity(content))
+      copyTextBtn.innerHTML = "{{ i18n.text("copied") }}"
+      setTimeout(() => { copyTextBtn.innerHTML = "{{ i18n.text("copy_text") }}" }, 1000)
+    })
+  }
+</script>
+
+{% include "footer.html" %}
