@@ -17,3 +17,7 @@ pasta_data/*
 .toolchain-downloads/
 target-gnu/
 .git-push/
+
+# Project-local agent tools and skills
+.agents/
+.tavily-venv/
